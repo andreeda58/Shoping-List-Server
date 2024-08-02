@@ -17,13 +17,14 @@ export const addAllProducts = async (req: Request, res: Response): Promise<void>
   }
 
   try {
+    //create multiple bulkOperations to send
     const bulkOperations: any[] = [];
     products.forEach((product: any) => {
       bulkOperations.push({ index: { _index: index, _id: product.productId } });
       bulkOperations.push(product);
     });
 
-    // Guardar los productos en el índice de productos
+    //save data
     const result = await bulkSaveDocuments(bulkOperations);
 
     res.status(201).json(result);

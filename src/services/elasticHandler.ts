@@ -3,6 +3,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+
+//service that allows me to manage the data that is sent and received from elastic
+
+
 const client = new Client({
   node: process.env.ELASTICSEARCH_NODE || 'http://localhost:9200',
   auth: {
