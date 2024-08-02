@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getDocument, saveDocument, searchDocuments,bulkSaveDocuments } from '../services/elasticHandler';
+import {  saveDocument,bulkSaveDocuments } from '../services/elasticHandler';
 import dotenv from 'dotenv';
 import { Product } from '../models/product';
 dotenv.config();
@@ -46,70 +46,4 @@ export const addNewProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-export const updateProductQuantity = async (req: Request, res: Response): Promise<void> => {
-  const { name, quantity } = req.body;
 
-  try {
-    // Buscar el producto por nombre
-    const searchResult = await searchDocuments(index, {
-      term: {
-        name
-      }
-    });
-
-    // Verificar que se encontró el producto
-    if (searchResult.length === 0) {
-      res.status(404).json({ error: 'Product not found' });
-      return;
-    }
-
-    const productId = searchResult[0].id;
-    const existingProduct = searchResult[0];
-
-    // Actualizar la cantidad del producto
-    const updatedProduct = {
-      ...existingProduct,
-      quantity
-    };
-
-    // Guardar el documento actualizado
-    const result = await saveDocument({
-      index,
-      id: productId,
-      body: updatedProduct
-    });
-
-    res.status(200).json(result);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ error: errorMessage });
-  }
-};
-
-export const getProductById = async (req: Request, res: Response): Promise<void> => {
-  const { id } = req.params;
-
-  try {
-    const result = await getDocument(index, id);
-    res.json(result);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ error: errorMessage });
-  }
-};
-
-export const getProductsByCategoryId = async (req: Request, res: Response): Promise<void> => {
-  const { categoryId } = req.params;
-
-  try {
-    const result = await searchDocuments(index, {
-      term: {
-        categoryId
-      }
-    });
-    res.json(result);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    res.status(500).json({ error: errorMessage });
-  }
-};
